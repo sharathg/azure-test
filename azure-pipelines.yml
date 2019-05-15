@@ -16,8 +16,8 @@ steps:
     repositoryName: '$(Build.Repository.Name)'
     action: 'create'
     target: '$(Build.SourceVersion)'
-    tagSource: 'auto'
-    #tag: # Required when action == Edit || Action == Delete || TagSource == Manual
+    tagSource: 'manual'
+    tag: test1
     title: Test1
     releaseNotesSource: 'file'
     releaseNotesFile: testfile.txt

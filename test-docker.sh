@@ -11,4 +11,4 @@ cat image.id
 echo ""
 echo ""
 echo "*** Test Docker ***"
-docker run -it -u 1000:1000 -v $PWD:/workspace/ -w /workspace $(cat image.id) bash test-versions.sh
+docker run -i -u 1000:1000 -v $PWD:/workspace/ -w /workspace $(cat image.id) bash test-versions.sh

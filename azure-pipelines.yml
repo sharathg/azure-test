@@ -1,28 +1,57 @@
-# Xcode
-# Build, test, and archive an Xcode workspace on macOS.
-# Add steps that install certificates, test, sign, and distribute an app, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/xcode
-
 pool:
   vmImage: 'macOS 10.13'
 
 steps:
-- bash: echo 'Hello World !' > testfile.txt 
-  displayName: 'Create a file'
 
-- task: GitHubRelease@0
+- bash: |
+    sdkmanager --help || true
+    adb --help || true
+    IMG_NAME='system-images;android-23;google_apis;x86'
+    DEV_TYPE='Nexus 4'
+    DEV_NAME="Nexus4Emu"
+    $ANDROID_HOME/tools/bin/sdkmanager "system-images;android-23;google_apis;x86"
+    $ANDROID_HOME/tools/bin/avdmanager create avd --device "${DEV_TYPE}" --package "${IMG_NAME}" --abi google_apis/x86 --name "${DEV_NAME}"
+    $ANDROID_HOME/emulator/emulator -avd Nexus4Emu &
+    echo $! >> emu.pid
+    sleep 60
+  displayName: 'Setup and Launch Emulator'
+
+- bash: |
+    $ANDROID_HOME/platform-tools/adb shell """
+    mount -o rw,remount rootfs /;
+    chmod 0777 /mnt/sdcard;
+    exit
+    """
+    $ANDROID_HOME/platform-tools/adb shell mkdir -p /mnt/sdcard/DCIM/
+    $ANDROID_HOME/platform-tools/adb shell """
+        screenrecord /mnt/sdcard/DCIM/1.mp4;
+        screenrecord /mnt/sdcard/DCIM/2.mp4;
+        screenrecord /mnt/sdcard/DCIM/3.mp4;
+        screenrecord /mnt/sdcard/DCIM/4.mp4;
+        screenrecord /mnt/sdcard/DCIM/5.mp4;
+        screenrecord /mnt/sdcard/DCIM/6.mp4;
+        screenrecord /mnt/sdcard/DCIM/7.mp4;
+        screenrecord /mnt/sdcard/DCIM/8.mp4;
+        screenrecord /mnt/sdcard/DCIM/9.mp4;
+        screenrecord /mnt/sdcard/DCIM/10.mp4; """ &
+    echo $! > video.pid
+    $ANDROID_HOME/platform-tools/adb logcat -c
+    $ANDROID_HOME/platform-tools/adb logcat > testresults/UIA-device.log &
+    echo $! > logcat.pid
+  displayName: 'Start Video Record and Logcat'
+
+- bash: |
+    sleep 30
+    kill -9 $(cat video.pid) || true
+    $ANDROID_HOME/platform-tools/adb pull /mnt/sdcard/DCIM/ $(Build.ArtifactStagingDirectory)/ || true
+    kill -9 $(cat logcat.pid) || true
+    adb kill-server
+    kill -9 $(cat emu.pid)
+  displayName: 'Copy Videos and Clean Up'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish'
   inputs:
-    gitHubConnection: github
-    repositoryName: '$(Build.Repository.Name)'
-    action: 'create'
-    target: '$(Build.SourceVersion)'
-    tagSource: 'manual'
-    tag: test1
-    title: Test1
-    releaseNotesSource: 'file'
-    releaseNotesFile: testfile.txt
-    #assets: '$(Build.ArtifactStagingDirectory)/*' # Optional
-    #assetUploadMode: 'delete' # Optional. Options: delete, replace
-    #isDraft: false # Optional
-    #isPreRelease: false # Optional
-    #addChangeLog: true # Optional
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: '$(Build.BuildId)'
+    publishLocation: 'Container'

@@ -45,7 +45,7 @@ steps:
     sleep 20
     kill -9 $(cat video.pid) || true
     sleep 10
-    $ANDROID_HOME/platform-tools/adb pull /mnt/sdcard/DCIM/ $(Build.ArtifactStagingDirectory)/ || true
+    $ANDROID_HOME/platform-tools/adb pull /mnt/sdcard/DCIM/*.* $(Build.ArtifactStagingDirectory)/ || true
     kill -9 $(cat logcat.pid) || true
     adb kill-server
     kill -9 $(cat emu.pid)

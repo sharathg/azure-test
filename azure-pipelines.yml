@@ -3,7 +3,7 @@ pool:
 
 steps:
 
-- bash: |
+- script: |
     sdkmanager --help || true
     adb --help || true
     IMG_NAME='system-images;android-23;google_apis;x86'
@@ -16,7 +16,7 @@ steps:
     sleep 60
   displayName: 'Setup and Launch Emulator'
 
-- bash: |
+- script: |
     $ANDROID_HOME/platform-tools/adb shell """
     mount -o rw,remount rootfs /;
     chmod 0777 /mnt/sdcard;
@@ -36,11 +36,11 @@ steps:
         screenrecord /mnt/sdcard/DCIM/10.mp4; """ &
     echo $! > video.pid
     $ANDROID_HOME/platform-tools/adb logcat -c
-    $ANDROID_HOME/platform-tools/adb logcat > testresults/UIA-device.log &
+    $ANDROID_HOME/platform-tools/adb logcat > $(Build.ArtifactStagingDirectory)/UIA-device.log &
     echo $! > logcat.pid
   displayName: 'Start Video Record and Logcat'
 
-- bash: |
+- script: |
     sleep 30
     kill -9 $(cat video.pid) || true
     $ANDROID_HOME/platform-tools/adb pull /mnt/sdcard/DCIM/ $(Build.ArtifactStagingDirectory)/ || true

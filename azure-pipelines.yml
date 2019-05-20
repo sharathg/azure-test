@@ -4,8 +4,6 @@ pool:
 steps:
 
 - script: |
-    sdkmanager --help || true
-    adb --help || true
     IMG_NAME='system-images;android-23;google_apis;x86'
     DEV_TYPE='Nexus 4'
     DEV_NAME="Nexus4Emu"
@@ -14,9 +12,12 @@ steps:
     $ANDROID_HOME/emulator/emulator -avd Nexus4Emu &
     echo $! >> emu.pid
     sleep 60
+    $ANDROID_HOME/platform-tools/adb devices
   displayName: 'Setup and Launch Emulator'
 
 - script: |
+    $ANDROID_HOME/platform-tools/adb devices
+    $ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed
     $ANDROID_HOME/platform-tools/adb shell """
     mount -o rw,remount rootfs /;
     chmod 0777 /mnt/sdcard;
@@ -41,8 +42,9 @@ steps:
   displayName: 'Start Video Record and Logcat'
 
 - script: |
-    sleep 30
+    sleep 20
     kill -9 $(cat video.pid) || true
+    sleep 10
     $ANDROID_HOME/platform-tools/adb pull /mnt/sdcard/DCIM/ $(Build.ArtifactStagingDirectory)/ || true
     kill -9 $(cat logcat.pid) || true
     adb kill-server

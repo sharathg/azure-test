@@ -7,22 +7,5 @@ pool:
   vmImage: 'macOS 10.13'
 
 steps:
-- bash: echo 'Hello World !' > testfile.txt 
-  displayName: 'Create a file'
-
-- task: GitHubRelease@0
-  inputs:
-    gitHubConnection: github
-    repositoryName: '$(Build.Repository.Name)'
-    action: 'create'
-    target: '$(Build.SourceVersion)'
-    tagSource: 'manual'
-    tag: test1
-    title: Test1
-    releaseNotesSource: 'file'
-    releaseNotesFile: testfile.txt
-    #assets: '$(Build.ArtifactStagingDirectory)/*' # Optional
-    #assetUploadMode: 'delete' # Optional. Options: delete, replace
-    #isDraft: false # Optional
-    #isPreRelease: false # Optional
-    #addChangeLog: true # Optional
+- bash: echo $(test.secret)
+  displayName: 'Print Secret File'

@@ -7,17 +7,5 @@ pool:
   vmImage: 'macOS 10.13'
 
 steps:
-- script: $(which npm) install -g appium wd
-  displayName: 'npm install'
-
-- script: $(which pip) install -r requirements.txt
-  displayName: 'pip install requirements'
-
-- script: avdmanager create avd --device "Nexus 5" --package "system-images;android-23;google_apis;x86" --abi google_apis/x86 --name "Nexus5Emu"
-  displayName: 'create AVD'
-
-- script: emulator Nexus5Emu
-  displayName: 'run AVD'
-
-- script: python test-appium.py
-  displayName: 'test appium'
+- bash: echo '$(test.secret)'
+  displayName: 'Print Secret File : $(test.secret)'

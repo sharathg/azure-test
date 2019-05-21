@@ -7,5 +7,5 @@ pool:
   vmImage: 'macOS 10.13'
 
 steps:
-- bash: echo $(test.secret)
-  displayName: 'Print Secret File'
+- bash: echo '$(test.secret)'
+  displayName: 'Print Secret File : $(test.secret)'

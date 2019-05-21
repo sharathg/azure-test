@@ -4,6 +4,7 @@ pool:
 steps:
 
 - script: |
+    echo $ANDROID_HOME
     IMG_NAME='system-images;android-23;google_apis;x86'
     DEV_TYPE='Nexus 4'
     DEV_NAME="Nexus4Emu"

@@ -8,6 +8,6 @@ pool:
 
 steps:
 - bash: |
-    echo $RANDOM_ENV
+    echo $SECRET_RANDOM_ENV
     echo "This is the Env data: $SECRET_RANDOM_ENV !"
   displayName: 'ENV-TEST'

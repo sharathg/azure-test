@@ -7,5 +7,5 @@ pool:
   vmImage: 'macOS 10.13'
 
 steps:
-- bash: echo $RANDOM_ENV
+- bash: echo "This is the Env data: --> ${RANDOM_ENV} <-- Here !"
   displayName: 'ENV-TEST'
